@@ -2,11 +2,35 @@
 
 module ActionHandler
   class Installer
+    attr_reader :args_maker
+    attr_reader :args_supplier
+
+    def initialize(
+      args_maker: ActionHandler::ArgsMaker.new,
+      # TODO: Use default arguments supplier.
+      args_supplier: nil
+    )
+      @args_maker = args_maker
+      @args_supplier = args_supplier
+    end
+
     def install(handler, ctrl_class)
       actions = own_public_methods(handler)
       actions.each do |name|
+        installer = self
         ctrl_class.send(:define_method, name) do
-          handler.method(name).call
+          method = handler.method(name)
+          args =
+            if installer.args_supplier
+              installer.args_maker.make_args(
+                method.parameters,
+                installer.args_supplier,
+                context: self,
+              )
+            else
+              []
+            end
+          handler.method(name).call(*args)
         end
       end
     end
