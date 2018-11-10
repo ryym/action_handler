@@ -8,13 +8,16 @@ module ActionHandler
   class Installer
     attr_reader :args_maker
     attr_reader :args_supplier
+    attr_reader :res_evaluator
 
     def initialize(
       args_maker: ActionHandler::ArgsMaker.new,
-      args_supplier: ActionHandler::DefaultArgs.new
+      args_supplier: ActionHandler::DefaultArgs.new,
+      res_evaluator: ActionHandler::ResponseEvaluator.new
     )
       @args_maker = args_maker
       @args_supplier = args_supplier
+      @res_evaluator = res_evaluator
     end
 
     def install(handler, ctrl_class)
@@ -28,7 +31,8 @@ module ActionHandler
             installer.args_supplier,
             context: self,
           )
-          handler.method(name).call(*args)
+          res = method.call(*args)
+          installer.res_evaluator.evaluate(self, res)
         end
       end
     end

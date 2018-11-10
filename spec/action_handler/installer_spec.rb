@@ -3,6 +3,14 @@
 require 'spec_helper'
 
 describe ActionHandler::Installer do
+  let(:noop_res_evaluator) do
+    Class.new do
+      def evaluate(_ctrl, res)
+        res
+      end
+    end.new
+  end
+
   describe '#install' do
     it 'registers same name public methods' do
       handler_class = Class.new do
@@ -16,7 +24,8 @@ describe ActionHandler::Installer do
       end
 
       ctrl_class = Class.new
-      ActionHandler::Installer.new.install(handler_class.new, ctrl_class)
+      installer = ActionHandler::Installer.new(res_evaluator: noop_res_evaluator)
+      installer.install(handler_class.new, ctrl_class)
       ctrl = ctrl_class.new
 
       expect(ctrl.index).to eq(status: :ok)
@@ -46,7 +55,10 @@ describe ActionHandler::Installer do
         end
       end
 
-      installer = ActionHandler::Installer.new(args_supplier: args_supplier.new)
+      installer = ActionHandler::Installer.new(
+        res_evaluator: noop_res_evaluator,
+        args_supplier: args_supplier.new,
+      )
       installer.install(handler_class.new, ctrl_class)
       ctrl = ctrl_class.new
 
