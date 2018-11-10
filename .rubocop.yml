@@ -2,6 +2,7 @@ AllCops:
   TargetRubyVersion: 2.5
   TargetRailsVersion: 5.1
   Exclude:
+    - "_work/**/*"
     # TODO: Use RuboCop for examples
     - "examples/**/*"
   UseCache: true
