@@ -1,0 +1,17 @@
+{
+  "name": "action_handler",
+  "private": true,
+  "description": "Just to use husky",
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.rb": ["bundle exec rubocop --auto-correct"]
+  },
+  "devDependencies": {
+    "husky": "^1.1.3",
+    "lint-staged": "^8.0.4"
+  }
+}
