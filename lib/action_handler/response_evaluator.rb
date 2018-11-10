@@ -9,10 +9,6 @@ module ActionHandler
         ctrl.render(res)
       when ActionHandler::Call
         res.call_with(ctrl)
-      when nil
-        nil
-      else
-        raise "unsupported response: #{res}"
       end
     end
   end
