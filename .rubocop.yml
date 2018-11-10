@@ -36,6 +36,10 @@ Layout/MultilineMethodCallIndentation:
   Enabled: true
   EnforcedStyle: indented
 
+# Why bad??
+Lint/EmptyWhen:
+  Enabled: false
+
 Metrics/AbcSize:
   Enabled: false
 
