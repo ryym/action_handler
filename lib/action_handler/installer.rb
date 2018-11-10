@@ -2,17 +2,10 @@
 
 module ActionHandler
   class Installer
-    attr_reader :ctrl_class
-    private :ctrl_class
-
-    def initialize(ctrl_class)
-      @ctrl_class = ctrl_class
-    end
-
-    def install(handler)
+    def install(handler, ctrl_class)
       actions = own_public_methods(handler)
       actions.each do |name|
-        @ctrl_class.send(:define_method, name) do
+        ctrl_class.send(:define_method, name) do
           handler.method(name).call
         end
       end

@@ -16,8 +16,7 @@ describe ActionHandler::Installer do
       end
 
       ctrl_class = Class.new
-      installer = ActionHandler::Installer.new(ctrl_class)
-      installer.install(handler_class.new)
+      ActionHandler::Installer.new.install(handler_class.new, ctrl_class)
       ctrl = ctrl_class.new
 
       expect(ctrl.index).to eq(status: :ok)

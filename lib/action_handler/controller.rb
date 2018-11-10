@@ -12,7 +12,7 @@ module ActionHandler
   module ControllerExtension
     def use_handler
       handler = yield
-      ActionHandler::Installer.new(self).install(handler)
+      ActionHandler::Installer.new.install(handler, self)
     end
   end
 end
