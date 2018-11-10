@@ -5,7 +5,7 @@ require 'spec_helper'
 describe ActionHandler::ArgsMaker do
   describe '#make_args' do
     it 'makes argument values' do
-      class Def
+      supplier_class = Class.new do
         def a
           [:alice, 1]
         end
@@ -15,20 +15,20 @@ describe ActionHandler::ArgsMaker do
         end
       end
 
-      class Consumer
+      user_class = Class.new do
         def use(b, a)
           [a[1], b[:bob]]
         end
       end
 
-      consumer = Consumer.new
-      params = consumer.method(:use).parameters
+      user = user_class.new
+      params = user.method(:use).parameters
 
       maker = ActionHandler::ArgsMaker.new
-      values = maker.make_args(params, Def.new)
+      values = maker.make_args(params, supplier_class.new)
 
       expect(values).to eq([{ bob: true }, [:alice, 1]])
-      expect(consumer.use(*values)).to eq([1, true])
+      expect(user.use(*values)).to eq([1, true])
     end
   end
 end
