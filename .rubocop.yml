@@ -69,6 +69,10 @@ Naming/UncommunicativeMethodParamName:
   Enabled: true
   MinNameLength: 1
 
+Style/AccessModifierDeclarations:
+  Enabled: true
+  EnforcedStyle: inline
+
 Style/AsciiComments:
   Enabled: false # TODO: Enable
 
