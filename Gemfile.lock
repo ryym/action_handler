@@ -44,7 +44,7 @@ PLATFORMS
 DEPENDENCIES
   action_handler!
   rspec (~> 3)
-  rubocop (~> 0)
+  rubocop (>= 0.49)
 
 RUBY VERSION
    ruby 2.5.1p57

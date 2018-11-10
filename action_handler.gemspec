@@ -15,5 +15,5 @@ Gem::Specification.new do |s|
   s.files = Dir['{app,config,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.md']
 
   s.add_development_dependency 'rspec', '~> 3'
-  s.add_development_dependency 'rubocop', '~> 0'
+  s.add_development_dependency 'rubocop', '>= 0.49'
 end
