@@ -4,8 +4,8 @@ require 'action_handler/installer'
 
 module ActionHandler
   module Controller
-    def self.included(ctrl)
-      ctrl.extend ActionHandler::ControllerExtension
+    def self.included(ctrl_class)
+      ctrl_class.extend ActionHandler::ControllerExtension
     end
   end
 

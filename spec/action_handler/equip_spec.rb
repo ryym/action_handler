@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe ActionHandler::Equip do
   it 'provides #render' do
-    ctrl_class = Class.new do
+    handler_class = Class.new do
       include ActionHandler::Equip
 
       def index
@@ -12,12 +12,12 @@ describe ActionHandler::Equip do
       end
     end
 
-    ctrl = ctrl_class.new
-    expect(ctrl.index).to eq(status: :ok, json: [1, 2])
+    handler = handler_class.new
+    expect(handler.index).to eq(status: :ok, json: [1, 2])
   end
 
   it 'provides #redirect_to' do
-    ctrl_class = Class.new do
+    handler_class = Class.new do
       include ActionHandler::Equip
 
       def index
@@ -25,8 +25,8 @@ describe ActionHandler::Equip do
       end
     end
 
-    ctrl = ctrl_class.new
-    expect(ctrl.index).to eq(
+    handler = handler_class.new
+    expect(handler.index).to eq(
       ActionHandler::Call.new(:redirect_to, ['/a/b/c', { alert: :abc }]),
     )
   end
