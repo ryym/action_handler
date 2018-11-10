@@ -21,7 +21,9 @@ module ActionHandler
     end
 
     def install(handler, ctrl_class)
-      actions = own_public_methods(handler)
+      config = ActionHandler::Config.get(handler.class) || ActionHandler::Config.new
+
+      actions = action_methods(handler, config)
       actions.each do |name|
         installer = self
         ctrl_class.send(:define_method, name) do
@@ -35,6 +37,10 @@ module ActionHandler
           installer.res_evaluator.evaluate(self, res)
         end
       end
+    end
+
+    private def action_methods(handler, config)
+      config.action_methods || own_public_methods(handler)
     end
 
     # List all public methods except super class methods.

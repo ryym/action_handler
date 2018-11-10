@@ -67,5 +67,32 @@ describe ActionHandler::Installer do
         session: :session,
       )
     end
+
+    context 'when action methods are specified' do
+      it 'adds these methods only' do
+        handler_class = Class.new do
+          include ActionHandler::Equip
+
+          action_methods :a, :c
+
+          def a; end
+
+          def b; end
+
+          def c; end
+        end
+
+        ctrl_class = Class.new
+        installer = ActionHandler::Installer.new
+        installer.install(handler_class.new, ctrl_class)
+        ctrl = ctrl_class.new
+
+        expect(
+          a: ctrl.respond_to?(:a),
+          b: ctrl.respond_to?(:b),
+          c: ctrl.respond_to?(:c),
+        ).to eq(a: true, b: false, c: true)
+      end
+    end
   end
 end

@@ -28,6 +28,13 @@ module ActionHandler
 
     def self.included(handler_class)
       ActionHandler::Config.set(handler_class, ActionHandler::Config.new)
+      handler_class.extend ActionHandler::HandlerExtension
+    end
+  end
+
+  module HandlerExtension
+    def action_methods(*method_names)
+      ActionHandler::Config.get(self).action_methods = method_names
     end
   end
 end
