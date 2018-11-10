@@ -25,5 +25,9 @@ module ActionHandler
     def urls
       Rails.application.routes.url_helpers
     end
+
+    def self.included(handler_class)
+      ActionHandler::Config.set(handler_class, ActionHandler::Config.new)
+    end
   end
 end
