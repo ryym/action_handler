@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'action_handler/call'
+
 module ActionHandler
   # Equip implements most basic functionality of controller for handler.
   module Equip
@@ -17,7 +19,7 @@ module ActionHandler
     end
 
     def redirect_to(*args)
-      { '@call': :redirect_to, args: args }
+      ActionHandler::Call.new(:redirect_to, args)
     end
 
     def urls

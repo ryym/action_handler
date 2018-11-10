@@ -6,19 +6,14 @@ module ActionHandler
     def evaluate(ctrl, res)
       case res
       when Hash
-        evaluate_hash(ctrl, res)
+        ctrl.render(res)
+      when ActionHandler::Call
+        res.call_with(ctrl)
       when nil
         nil
       else
         raise "unsupported response: #{res}"
       end
-    end
-
-    private def evaluate_hash(ctrl, res)
-      method = res[:@call]
-      return ctrl.send(method, *(res[:args] || [])) if method
-
-      ctrl.render(res)
     end
   end
 end

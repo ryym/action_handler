@@ -27,8 +27,7 @@ describe ActionHandler::Equip do
 
     ctrl = ctrl_class.new
     expect(ctrl.index).to eq(
-      '@call': :redirect_to,
-      args: ['/a/b/c', { alert: :abc }],
+      ActionHandler::Call.new(:redirect_to, ['/a/b/c', { alert: :abc }]),
     )
   end
 

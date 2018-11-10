@@ -25,7 +25,8 @@ describe ActionHandler::ResponseEvaluator do
         end.new
 
         evaluator = ActionHandler::ResponseEvaluator.new
-        res = evaluator.evaluate(ctrl, { '@call': :redirect_to, args: ['/hoge'] })
+        call = ActionHandler::Call.new(:redirect_to, ['/hoge'])
+        res = evaluator.evaluate(ctrl, call)
         expect(res).to eq('redirect_to /hoge')
       end
     end
