@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'action_handler/installer'
+
 module ActionHandler
   module Controller
     def self.included(ctrl)
@@ -9,7 +11,8 @@ module ActionHandler
 
   module ControllerExtension
     def use_handler
-      yield # unimplemented
+      handler = yield
+      ActionHandler::Installer.new(self).install(handler)
     end
   end
 end
