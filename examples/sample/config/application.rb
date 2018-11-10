@@ -22,9 +22,16 @@ module Sample
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 5.2
 
-    # Settings in config/environments/* take precedence over those specified here.
-    # Application configuration can go into files in config/initializers
-    # -- all .rb files in that directory are automatically loaded after loading
-    # the framework and any gems in your application.
+    # Autoload the library.
+    config.autoload_paths << Rails.root.join('../../lib')
+
+    if Rails.env.development?
+      config.to_prepare do
+        Object.class_eval { remove_const :ActionHandler if defined? ActionHandler }
+      end
+    end
+
+    config.generators.assets = false
+    config.generators.helper = false
   end
 end
