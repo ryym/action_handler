@@ -2,6 +2,7 @@
 
 require 'action_handler/args_maker'
 require 'action_handler/default_args'
+require 'action_handler/response_evaluator'
 
 module ActionHandler
   class Installer
