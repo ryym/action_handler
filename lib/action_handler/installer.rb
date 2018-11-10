@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'action_handler/args_maker'
+require 'action_handler/default_args'
+
 module ActionHandler
   class Installer
     attr_reader :args_maker
@@ -7,8 +10,7 @@ module ActionHandler
 
     def initialize(
       args_maker: ActionHandler::ArgsMaker.new,
-      # TODO: Use default arguments supplier.
-      args_supplier: nil
+      args_supplier: ActionHandler::DefaultArgs.new
     )
       @args_maker = args_maker
       @args_supplier = args_supplier
@@ -20,16 +22,11 @@ module ActionHandler
         installer = self
         ctrl_class.send(:define_method, name) do
           method = handler.method(name)
-          args =
-            if installer.args_supplier
-              installer.args_maker.make_args(
-                method.parameters,
-                installer.args_supplier,
-                context: self,
-              )
-            else
-              []
-            end
+          args = installer.args_maker.make_args(
+            method.parameters,
+            installer.args_supplier,
+            context: self,
+          )
           handler.method(name).call(*args)
         end
       end
