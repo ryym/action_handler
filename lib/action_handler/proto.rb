@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ActionHandler
   module Proto
     def use_handler
@@ -15,17 +17,16 @@ module ActionHandler
         end
       end
 
-      if config.as_controller.is_a?(Proc)
-        controller.class_eval &config.as_controller
-      end
+      controller.class_eval(&config.as_controller) if config.as_controller.is_a?(Proc)
 
-      if config.action_args.is_a?(Proc)
-        make_args = config.action_args
-      else
-        make_args = lambda { |_action, ctrl|
-          [ctrl.params]
-        }
-      end
+      make_args =
+        if config.action_args.is_a?(Proc)
+          config.action_args
+        else
+          lambda { |_action, ctrl|
+            [ctrl.params]
+          }
+        end
 
       actions.each do |name|
         controller.send(:define_method, name) do
@@ -33,7 +34,7 @@ module ActionHandler
           raise "#{handler.class.name}.args must return an array" unless args.is_a?(Array)
 
           method = handler.method(name)
-          args = [] if method.parameters.size == 0
+          args = [] if method.parameters.empty?
           ret = method.call(*args)
           case ret
           when Hash
