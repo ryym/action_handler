@@ -203,6 +203,32 @@ describe ActionHandler::Installer do
     end
   end
 
+  context 'when args_params are specified' do
+    it 'supplies specified param values' do
+      handler_class = Class.new do
+        include ActionHandler::Equip
+
+        args_params :a, :c
+
+        def show(params, a, c)
+          { got: [a, c], params: params }
+        end
+      end
+
+      ctrl_class = Class.new do
+        def params
+          { a: 1, b: 2, c: 3 }
+        end
+      end
+
+      installer = ActionHandler::Installer.new(res_evaluator: noop_res_evaluator)
+      installer.install(handler_class.new, ctrl_class)
+      ctrl = ctrl_class.new
+
+      expect(ctrl.show).to eq(got: [1, 3], params: { a: 1, b: 2, c: 3 })
+    end
+  end
+
   context 'when as_controller is specified' do
     it 'runs given block inside of controller' do
       handler_class = Class.new do

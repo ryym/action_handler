@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'action_handler/args/params'
+
 module ActionHandler
   module Args
     module_function def from_hash(name_to_proc)

@@ -52,6 +52,12 @@ module ActionHandler
       end
     end
 
+    def args_params(*names)
+      ActionHandler::Config.get(self).add_args_supplier(
+        ActionHandler::Args::Params.new(*names),
+      )
+    end
+
     def arg(name, &block)
       unless block_given?
         raise '`arg` requires block. Use `args` to register arguments supplier object'
