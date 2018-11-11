@@ -7,6 +7,21 @@
   </head>
 
   <body>
+    <header>
+      <% if current_user %>
+        <%= link_to('Mypage', mypage_path) %>
+      <% else %>
+        <%= link_to('Log in', login_path) %>
+      <% end %>
+
+      <%= link_to('users', users_path) %>
+    </header>
+    <hr>
+
+    <% if flash[:alert] %>
+      <p><%= flash[:alert] %></p>
+    <% end %>
+
     <%= yield %>
   </body>
 </html>
