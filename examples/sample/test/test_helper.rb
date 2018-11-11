@@ -4,11 +4,22 @@ ENV['RAILS_ENV'] ||= 'test'
 require_relative '../config/environment'
 require 'rails/test_help'
 
-class ActiveSupport
-  class TestCase
-    # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
-    fixtures :all
+require 'minitest/mock'
 
-    # Add more helper methods to be used by all tests here...
+ActionHandler.autoload_handlers_from_controller_file
+
+module ActiveSupport
+  class TestCase
+    def urls
+      Rails.application.routes.url_helpers
+    end
+
+    setup do
+      DatabaseRewinder.clean_all
+    end
+
+    teardown do
+      DatabaseRewinder.clean
+    end
   end
 end
