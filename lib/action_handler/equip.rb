@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'action_handler/call'
+require 'action_handler/args/default'
 
 module ActionHandler
   # Equip implements most basic functionality of controller for handler.
@@ -29,12 +30,20 @@ module ActionHandler
     def self.included(handler_class)
       ActionHandler::Config.set(handler_class, ActionHandler::Config.new)
       handler_class.extend ActionHandler::HandlerExtension
+      handler_class.args ActionHandler::Args::Default.new
     end
   end
 
   module HandlerExtension
     def action_methods(*method_names)
       ActionHandler::Config.get(self).action_methods = method_names
+    end
+
+    def args(*suppliers)
+      config = ActionHandler::Config.get(self)
+      suppliers.each do |supplier|
+        config.add_args_supplier(supplier)
+      end
     end
 
     def arg(name, &block)

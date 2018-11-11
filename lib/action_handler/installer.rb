@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'action_handler/args_maker'
-require 'action_handler/args/default'
 require 'action_handler/response_evaluator'
 
 module ActionHandler
@@ -11,11 +10,9 @@ module ActionHandler
 
     def initialize(
       args_maker: ActionHandler::ArgsMaker.new,
-      args_supplier: ActionHandler::Args::Default.new,
       res_evaluator: ActionHandler::ResponseEvaluator.new
     )
       @args_maker = args_maker
-      @default_args_supplier = args_supplier
       @res_evaluator = res_evaluator
     end
 
@@ -44,13 +41,16 @@ module ActionHandler
     end
 
     private def args_supplier(config)
-      return @default_args_supplier if config.custom_args.empty?
+      args_hash = {}
 
-      args_hash = own_public_methods(@default_args_supplier).inject({}) do |h, name|
-        h[name] = @default_args_supplier.method(name)
-        h
+      config.args_suppliers.each do |supplier|
+        own_public_methods(supplier).each do |name|
+          args_hash[name] = supplier.method(name)
+        end
       end
-      ActionHandler::Args.from_hash(args_hash.merge(config.custom_args))
+
+      args_hash = args_hash.merge(config.custom_args)
+      ActionHandler::Args.from_hash(args_hash)
     end
 
     # List all public methods except super class methods.

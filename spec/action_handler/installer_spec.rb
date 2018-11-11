@@ -34,31 +34,24 @@ describe ActionHandler::Installer do
 
     it 'auto injects some arguments' do
       handler_class = Class.new do
+        include ActionHandler::Equip
+
         def show(params, session)
           { params: params, session: session }
         end
       end
 
       ctrl_class = Class.new do
+        def session
+          :session
+        end
+
         def params
           { id: 1 }
         end
       end
 
-      args_supplier = Class.new do
-        def session(_ctrl)
-          :session
-        end
-
-        def params(ctrl)
-          ctrl.params
-        end
-      end
-
-      installer = ActionHandler::Installer.new(
-        res_evaluator: noop_res_evaluator,
-        args_supplier: args_supplier.new,
-      )
+      installer = ActionHandler::Installer.new(res_evaluator: noop_res_evaluator)
       installer.install(handler_class.new, ctrl_class)
       ctrl = ctrl_class.new
 
@@ -95,23 +88,70 @@ describe ActionHandler::Installer do
       end
     end
 
-    context 'when custom args are specified' do
-      it 'merges them with the default arguments supplier' do
+    context 'when args suppliers are specified' do
+      it 'merges them with the default supplier' do
+        args_supplier_class = Class.new do
+          def initialize(prefix)
+            @prefix = prefix
+          end
+
+          def name(ctrl)
+            "#{@prefix}#{ctrl.params[:name]}"
+          end
+        end
+
         handler_class = Class.new do
           include ActionHandler::Equip
 
-          arg(:id) do |ctrl|
-            ctrl.params[:id]
-          end
+          args args_supplier_class.new('Mr. ')
 
-          def show(id, cookies)
-            render locals: { id: id, cookie: cookies[:cookie] }
+          def show(name, params)
+            { name: name, params: params }
           end
         end
 
         ctrl_class = Class.new do
           def params
-            { id: 333 }
+            { name: 'Ryu' }
+          end
+        end
+
+        installer = ActionHandler::Installer.new(res_evaluator: noop_res_evaluator)
+        installer.install(handler_class.new, ctrl_class)
+        ctrl = ctrl_class.new
+
+        expect(ctrl.show).to eq(
+          name: 'Mr. Ryu',
+          params: { name: 'Ryu' },
+        )
+      end
+    end
+
+    context 'when custom args are specified' do
+      it 'merges them with the arguments suppliers' do
+        args_supplier_class = Class.new do
+          def name(ctrl)
+            ctrl.params[:name]
+          end
+        end
+
+        handler_class = Class.new do
+          include ActionHandler::Equip
+
+          args args_supplier_class.new
+
+          arg(:id) do |ctrl|
+            ctrl.params[:id]
+          end
+
+          def show(id, cookies, name)
+            { id: id, name: name, cookie: cookies[:cookie] }
+          end
+        end
+
+        ctrl_class = Class.new do
+          def params
+            { id: 333, name: 'Gon' }
           end
 
           def cookies
@@ -123,7 +163,41 @@ describe ActionHandler::Installer do
         installer.install(handler_class.new, ctrl_class)
         ctrl = ctrl_class.new
 
-        expect(ctrl.show).to eq(locals: { id: 333, cookie: :cookie })
+        expect(ctrl.show).to eq(id: 333, name: 'Gon', cookie: :cookie)
+      end
+
+      it 'overrides same name suppliers' do
+        args_supplier_class = Class.new do
+          def name(ctrl)
+            ctrl.params[:name]
+          end
+        end
+
+        handler_class = Class.new do
+          include ActionHandler::Equip
+
+          args args_supplier_class.new
+
+          arg(:name) do |ctrl|
+            "override #{ctrl.params[:name]}"
+          end
+
+          def show(name)
+            { name: name }
+          end
+        end
+
+        ctrl_class = Class.new do
+          def params
+            { name: 'Foo' }
+          end
+        end
+
+        installer = ActionHandler::Installer.new(res_evaluator: noop_res_evaluator)
+        installer.install(handler_class.new, ctrl_class)
+        ctrl = ctrl_class.new
+
+        expect(ctrl.show).to eq(name: 'override Foo')
       end
     end
   end
