@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'action_handler/args_maker'
-require 'action_handler/default_args'
+require 'action_handler/args/default'
 require 'action_handler/response_evaluator'
 
 module ActionHandler
@@ -12,7 +12,7 @@ module ActionHandler
 
     def initialize(
       args_maker: ActionHandler::ArgsMaker.new,
-      args_supplier: ActionHandler::DefaultArgs.new,
+      args_supplier: ActionHandler::Args::Default.new,
       res_evaluator: ActionHandler::ResponseEvaluator.new
     )
       @args_maker = args_maker
