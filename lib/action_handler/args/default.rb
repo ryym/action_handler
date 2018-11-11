@@ -4,10 +4,14 @@ module ActionHandler
   module Args
     # Args::Default is a default arguments supplier for handler methods.
     class Default
-      %i[params request response cookies flash session remove_session logger].each do |key|
+      %i[params request response cookies flash session logger].each do |key|
         define_method(key) do |ctrl|
           ctrl.send(key)
         end
+      end
+
+      def reset_session(ctrl)
+        ctrl.method(:reset_session)
       end
 
       def format(ctrl)
