@@ -2,6 +2,9 @@
 
 require 'spec_helper'
 
+# This class is a main logic of this library.
+# So these tests are almost integration tests.
+# We think this is enough to test this small library.
 describe ActionHandler::Installer do
   let(:noop_res_evaluator) do
     Class.new do
@@ -11,43 +14,107 @@ describe ActionHandler::Installer do
     end.new
   end
 
-  describe '#install' do
-    it 'registers same name public methods' do
-      handler_class = Class.new do
-        def index
-          { status: :ok }
-        end
-
-        def show
-          { json: :hello }
-        end
+  it 'registers same name public methods' do
+    handler_class = Class.new do
+      def index
+        { status: :ok }
       end
 
-      ctrl_class = Class.new
-      installer = ActionHandler::Installer.new(res_evaluator: noop_res_evaluator)
-      installer.install(handler_class.new, ctrl_class)
-      ctrl = ctrl_class.new
-
-      expect(ctrl.index).to eq(status: :ok)
-      expect(ctrl.show).to eq(json: :hello)
+      def show
+        { json: :hello }
+      end
     end
 
-    it 'auto injects some arguments' do
+    ctrl_class = Class.new
+    installer = ActionHandler::Installer.new(res_evaluator: noop_res_evaluator)
+    installer.install(handler_class.new, ctrl_class)
+    ctrl = ctrl_class.new
+
+    expect(ctrl.index).to eq(status: :ok)
+    expect(ctrl.show).to eq(json: :hello)
+  end
+
+  it 'auto injects some arguments' do
+    handler_class = Class.new do
+      include ActionHandler::Equip
+
+      def show(params, session)
+        { params: params, session: session }
+      end
+    end
+
+    ctrl_class = Class.new do
+      def session
+        :session
+      end
+
+      def params
+        { id: 1 }
+      end
+    end
+
+    installer = ActionHandler::Installer.new(res_evaluator: noop_res_evaluator)
+    installer.install(handler_class.new, ctrl_class)
+    ctrl = ctrl_class.new
+
+    expect(ctrl.show).to eq(
+      params: { id: 1 },
+      session: :session,
+    )
+  end
+
+  context 'when action methods are specified' do
+    it 'adds these methods only' do
       handler_class = Class.new do
         include ActionHandler::Equip
 
-        def show(params, session)
-          { params: params, session: session }
+        action_methods :a, :c
+
+        def a; end
+
+        def b; end
+
+        def c; end
+      end
+
+      ctrl_class = Class.new
+      installer = ActionHandler::Installer.new
+      installer.install(handler_class.new, ctrl_class)
+      ctrl = ctrl_class.new
+
+      expect(
+        a: ctrl.respond_to?(:a),
+        b: ctrl.respond_to?(:b),
+        c: ctrl.respond_to?(:c),
+      ).to eq(a: true, b: false, c: true)
+    end
+  end
+
+  context 'when args suppliers are specified' do
+    it 'merges them with the default supplier' do
+      args_supplier_class = Class.new do
+        def initialize(prefix)
+          @prefix = prefix
+        end
+
+        def name(ctrl)
+          "#{@prefix}#{ctrl.params[:name]}"
+        end
+      end
+
+      handler_class = Class.new do
+        include ActionHandler::Equip
+
+        args args_supplier_class.new('Mr. ')
+
+        def show(name, params)
+          { name: name, params: params }
         end
       end
 
       ctrl_class = Class.new do
-        def session
-          :session
-        end
-
         def params
-          { id: 1 }
+          { name: 'Ryu' }
         end
       end
 
@@ -56,149 +123,83 @@ describe ActionHandler::Installer do
       ctrl = ctrl_class.new
 
       expect(ctrl.show).to eq(
-        params: { id: 1 },
-        session: :session,
+        name: 'Mr. Ryu',
+        params: { name: 'Ryu' },
       )
     end
+  end
 
-    context 'when action methods are specified' do
-      it 'adds these methods only' do
-        handler_class = Class.new do
-          include ActionHandler::Equip
+  context 'when custom args are specified' do
+    it 'merges them with the arguments suppliers' do
+      args_supplier_class = Class.new do
+        def name(ctrl)
+          ctrl.params[:name]
+        end
+      end
 
-          action_methods :a, :c
+      handler_class = Class.new do
+        include ActionHandler::Equip
 
-          def a; end
+        args args_supplier_class.new
 
-          def b; end
-
-          def c; end
+        arg(:id) do |ctrl|
+          ctrl.params[:id]
         end
 
-        ctrl_class = Class.new
-        installer = ActionHandler::Installer.new
-        installer.install(handler_class.new, ctrl_class)
-        ctrl = ctrl_class.new
-
-        expect(
-          a: ctrl.respond_to?(:a),
-          b: ctrl.respond_to?(:b),
-          c: ctrl.respond_to?(:c),
-        ).to eq(a: true, b: false, c: true)
+        def show(id, cookies, name)
+          { id: id, name: name, cookie: cookies[:cookie] }
+        end
       end
+
+      ctrl_class = Class.new do
+        def params
+          { id: 333, name: 'Gon' }
+        end
+
+        def cookies
+          { cookie: :cookie }
+        end
+      end
+
+      installer = ActionHandler::Installer.new(res_evaluator: noop_res_evaluator)
+      installer.install(handler_class.new, ctrl_class)
+      ctrl = ctrl_class.new
+
+      expect(ctrl.show).to eq(id: 333, name: 'Gon', cookie: :cookie)
     end
 
-    context 'when args suppliers are specified' do
-      it 'merges them with the default supplier' do
-        args_supplier_class = Class.new do
-          def initialize(prefix)
-            @prefix = prefix
-          end
-
-          def name(ctrl)
-            "#{@prefix}#{ctrl.params[:name]}"
-          end
+    it 'overrides same name suppliers' do
+      args_supplier_class = Class.new do
+        def name(ctrl)
+          ctrl.params[:name]
         end
-
-        handler_class = Class.new do
-          include ActionHandler::Equip
-
-          args args_supplier_class.new('Mr. ')
-
-          def show(name, params)
-            { name: name, params: params }
-          end
-        end
-
-        ctrl_class = Class.new do
-          def params
-            { name: 'Ryu' }
-          end
-        end
-
-        installer = ActionHandler::Installer.new(res_evaluator: noop_res_evaluator)
-        installer.install(handler_class.new, ctrl_class)
-        ctrl = ctrl_class.new
-
-        expect(ctrl.show).to eq(
-          name: 'Mr. Ryu',
-          params: { name: 'Ryu' },
-        )
-      end
-    end
-
-    context 'when custom args are specified' do
-      it 'merges them with the arguments suppliers' do
-        args_supplier_class = Class.new do
-          def name(ctrl)
-            ctrl.params[:name]
-          end
-        end
-
-        handler_class = Class.new do
-          include ActionHandler::Equip
-
-          args args_supplier_class.new
-
-          arg(:id) do |ctrl|
-            ctrl.params[:id]
-          end
-
-          def show(id, cookies, name)
-            { id: id, name: name, cookie: cookies[:cookie] }
-          end
-        end
-
-        ctrl_class = Class.new do
-          def params
-            { id: 333, name: 'Gon' }
-          end
-
-          def cookies
-            { cookie: :cookie }
-          end
-        end
-
-        installer = ActionHandler::Installer.new(res_evaluator: noop_res_evaluator)
-        installer.install(handler_class.new, ctrl_class)
-        ctrl = ctrl_class.new
-
-        expect(ctrl.show).to eq(id: 333, name: 'Gon', cookie: :cookie)
       end
 
-      it 'overrides same name suppliers' do
-        args_supplier_class = Class.new do
-          def name(ctrl)
-            ctrl.params[:name]
-          end
+      handler_class = Class.new do
+        include ActionHandler::Equip
+
+        args args_supplier_class.new
+
+        arg(:name) do |ctrl|
+          "override #{ctrl.params[:name]}"
         end
 
-        handler_class = Class.new do
-          include ActionHandler::Equip
-
-          args args_supplier_class.new
-
-          arg(:name) do |ctrl|
-            "override #{ctrl.params[:name]}"
-          end
-
-          def show(name)
-            { name: name }
-          end
+        def show(name)
+          { name: name }
         end
-
-        ctrl_class = Class.new do
-          def params
-            { name: 'Foo' }
-          end
-        end
-
-        installer = ActionHandler::Installer.new(res_evaluator: noop_res_evaluator)
-        installer.install(handler_class.new, ctrl_class)
-        ctrl = ctrl_class.new
-
-        expect(ctrl.show).to eq(name: 'override Foo')
       end
+
+      ctrl_class = Class.new do
+        def params
+          { name: 'Foo' }
+        end
+      end
+
+      installer = ActionHandler::Installer.new(res_evaluator: noop_res_evaluator)
+      installer.install(handler_class.new, ctrl_class)
+      ctrl = ctrl_class.new
+
+      expect(ctrl.show).to eq(name: 'override Foo')
     end
   end
 end
