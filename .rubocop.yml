@@ -3,8 +3,14 @@ AllCops:
   TargetRailsVersion: 5.1
   Exclude:
     - "_work/**/*"
-    # TODO: Use RuboCop for examples
-    - "examples/**/*"
+    - "examples/sample/db/schema.rb"
+    - "examples/sample/log/**/*"
+    - "examples/sample/public/**/*"
+    - "examples/sample/tmp/**/*"
+    - "examples/sample/vendor/**/*"
+    - "examples/sample/node_modules/**/*"
+    - "examples/sample/bin/*"
+    - !ruby/regexp /examples\/sample\/config\/(?!routes\.rb$).*/
   UseCache: true
   DisplayCopNames: true
   DisplayStyleGuide: true

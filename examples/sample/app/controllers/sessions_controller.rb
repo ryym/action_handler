@@ -12,9 +12,7 @@ class SessionsHandler
 
   def login(params, session, reset_session)
     user = User.find_by(name: params[:name])
-    if user.nil?
-      return redirect_to urls.login_path, alert: "#{params[:name]} does not exist"
-    end
+    return redirect_to urls.login_path, alert: "#{params[:name]} does not exist" if user.nil?
 
     reset_session.call
     session[:user_id] = user.id
