@@ -15,15 +15,21 @@ module ActionHandler
     end
 
     attr_reader :action_methods
+    attr_reader :custom_args
 
     def initialize
       @action_methods = nil
+      @custom_args = {}
     end
 
     def action_methods=(names)
       raise ArgumentError, 'must be array' unless names.is_a?(Array)
 
       @action_methods = names
+    end
+
+    def add_arg(name, &block)
+      @custom_args[name] = block
     end
   end
 end

@@ -7,7 +7,6 @@ require 'action_handler/response_evaluator'
 module ActionHandler
   class Installer
     attr_reader :args_maker
-    attr_reader :args_supplier
     attr_reader :res_evaluator
 
     def initialize(
@@ -16,7 +15,7 @@ module ActionHandler
       res_evaluator: ActionHandler::ResponseEvaluator.new
     )
       @args_maker = args_maker
-      @args_supplier = args_supplier
+      @default_args_supplier = args_supplier
       @res_evaluator = res_evaluator
     end
 
@@ -24,13 +23,14 @@ module ActionHandler
       config = ActionHandler::Config.get(handler.class) || ActionHandler::Config.new
 
       actions = action_methods(handler, config)
+      args_supplier = args_supplier(config)
       actions.each do |name|
         installer = self
         ctrl_class.send(:define_method, name) do
           method = handler.method(name)
           args = installer.args_maker.make_args(
             method.parameters,
-            installer.args_supplier,
+            args_supplier,
             context: self,
           )
           res = method.call(*args)
@@ -41,6 +41,13 @@ module ActionHandler
 
     private def action_methods(handler, config)
       config.action_methods || own_public_methods(handler)
+    end
+
+    # TODO: Merge args suppliers.
+    private def args_supplier(config)
+      return @default_args_supplier if config.custom_args.empty?
+
+      ActionHandler::Args.from_hash(config.custom_args)
     end
 
     # List all public methods except super class methods.

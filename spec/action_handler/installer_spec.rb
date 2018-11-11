@@ -94,5 +94,33 @@ describe ActionHandler::Installer do
         ).to eq(a: true, b: false, c: true)
       end
     end
+
+    context 'when custom args are specified' do
+      it 'constructs custom arguments supplier' do
+        handler_class = Class.new do
+          include ActionHandler::Equip
+
+          arg(:id) do |ctrl|
+            ctrl.params[:id]
+          end
+
+          def show(id)
+            render locals: { id: id }
+          end
+        end
+
+        ctrl_class = Class.new do
+          def params
+            { id: 333 }
+          end
+        end
+
+        installer = ActionHandler::Installer.new(res_evaluator: noop_res_evaluator)
+        installer.install(handler_class.new, ctrl_class)
+        ctrl = ctrl_class.new
+
+        expect(ctrl.show).to eq(locals: { id: 333 })
+      end
+    end
   end
 end

@@ -36,5 +36,9 @@ module ActionHandler
     def action_methods(*method_names)
       ActionHandler::Config.get(self).action_methods = method_names
     end
+
+    def arg(name, &block)
+      ActionHandler::Config.get(self).add_arg(name, &block)
+    end
   end
 end
