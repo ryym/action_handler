@@ -35,11 +35,17 @@ module ActionHandler
   end
 
   module HandlerExtension
+    def as_controller(&block)
+      ActionHandler::Config.get(self).as_controller = block
+    end
+
     def action_methods(*method_names)
       ActionHandler::Config.get(self).action_methods = method_names
     end
 
     def args(*suppliers)
+      raise '`args` does not accept block. Use `arg` to define custom argument' if block_given?
+
       config = ActionHandler::Config.get(self)
       suppliers.each do |supplier|
         config.add_args_supplier(supplier)
@@ -47,6 +53,10 @@ module ActionHandler
     end
 
     def arg(name, &block)
+      unless block_given?
+        raise '`arg` requires block. Use `args` to register arguments supplier object'
+      end
+
       ActionHandler::Config.get(self).add_arg(name, &block)
     end
   end
