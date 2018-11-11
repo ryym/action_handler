@@ -20,4 +20,22 @@ describe ActionHandler::Args::Params do
 
     expect(args).to eq([5, 'foo'])
   end
+
+  it 'accepts permitted params' do
+    consumer = Class.new do
+      def use(id, user); end
+    end.new
+
+    ctrl = Class.new do
+      def params
+        MockParams.new(id: 1, user: { name: 'foo', location: :tokyo, age: 20 })
+      end
+    end.new
+
+    supplier = ActionHandler::Args::Params.new(:id, user: %i[name age])
+    maker = ActionHandler::ArgsMaker.new
+    args = maker.make_args(consumer.method(:use).parameters, supplier, context: ctrl)
+
+    expect(args).to eq([1, { name: 'foo', age: 20 }])
+  end
 end

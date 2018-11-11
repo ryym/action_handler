@@ -208,16 +208,17 @@ describe ActionHandler::Installer do
       handler_class = Class.new do
         include ActionHandler::Equip
 
-        args_params :a, :c
+        args_params :a, :c, lang: %i[name author]
 
-        def show(params, a, c)
-          { got: [a, c], params: params }
+        def show(params, a, c, lang)
+          { got: [a, c], lang: lang, count: params.size }
         end
       end
 
       ctrl_class = Class.new do
         def params
-          { a: 1, b: 2, c: 3 }
+          lang = { name: 'Ruby', author: 'Matz', color: 'red' }
+          MockParams.new(a: 1, b: 2, c: 3, lang: lang)
         end
       end
 
@@ -225,7 +226,11 @@ describe ActionHandler::Installer do
       installer.install(handler_class.new, ctrl_class)
       ctrl = ctrl_class.new
 
-      expect(ctrl.show).to eq(got: [1, 3], params: { a: 1, b: 2, c: 3 })
+      expect(ctrl.show).to eq(
+        got: [1, 3],
+        lang: { name: 'Ruby', author: 'Matz' },
+        count: 4,
+      )
     end
   end
 
