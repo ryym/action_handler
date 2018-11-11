@@ -87,7 +87,7 @@ Style/AccessModifierDeclarations:
   EnforcedStyle: inline
 
 Style/AsciiComments:
-  Enabled: false # TODO: Enable
+  Enabled: true
 
 Style/BracesAroundHashParameters:
   Enabled: false
@@ -117,5 +117,5 @@ Style/TrailingCommaInHashLiteral:
   EnforcedStyleForMultiline: comma
 
 Rails:
-  Enabled: false # TODO: Enable
+  Enabled: true
 
