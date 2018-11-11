@@ -43,11 +43,14 @@ module ActionHandler
       config.action_methods || own_public_methods(handler)
     end
 
-    # TODO: Merge args suppliers.
     private def args_supplier(config)
       return @default_args_supplier if config.custom_args.empty?
 
-      ActionHandler::Args.from_hash(config.custom_args)
+      args_hash = own_public_methods(@default_args_supplier).inject({}) do |h, name|
+        h[name] = @default_args_supplier.method(name)
+        h
+      end
+      ActionHandler::Args.from_hash(args_hash.merge(config.custom_args))
     end
 
     # List all public methods except super class methods.

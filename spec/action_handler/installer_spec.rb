@@ -96,7 +96,7 @@ describe ActionHandler::Installer do
     end
 
     context 'when custom args are specified' do
-      it 'constructs custom arguments supplier' do
+      it 'merges them with the default arguments supplier' do
         handler_class = Class.new do
           include ActionHandler::Equip
 
@@ -104,8 +104,8 @@ describe ActionHandler::Installer do
             ctrl.params[:id]
           end
 
-          def show(id)
-            render locals: { id: id }
+          def show(id, cookies)
+            render locals: { id: id, cookie: cookies[:cookie] }
           end
         end
 
@@ -113,13 +113,17 @@ describe ActionHandler::Installer do
           def params
             { id: 333 }
           end
+
+          def cookies
+            { cookie: :cookie }
+          end
         end
 
         installer = ActionHandler::Installer.new(res_evaluator: noop_res_evaluator)
         installer.install(handler_class.new, ctrl_class)
         ctrl = ctrl_class.new
 
-        expect(ctrl.show).to eq(locals: { id: 333 })
+        expect(ctrl.show).to eq(locals: { id: 333, cookie: :cookie })
       end
     end
   end
