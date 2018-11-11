@@ -5,11 +5,15 @@ class PingsHandler
     { locals: { pong: :pong_from_handler } }
   end
 
-  def show(params)
-    render json: {
-      id: params[:id],
-      pong: "pong by #{params[:id]}",
-    }
+  def show(params, format)
+    if format == :json
+      render json: {
+        id: params[:id],
+        pong: "pong by #{params[:id]}",
+      }
+    else
+      render plain: 'Pong!'
+    end
   end
 end
 
