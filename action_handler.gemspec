@@ -11,6 +11,7 @@ Gem::Specification.new do |s|
   s.summary = 'Rails controller alternative'
   s.description = 'Makes your controllers more unit-testable.'
   s.license = 'MIT'
+  s.required_ruby_version = '>= 2.3'
 
   s.files = Dir['lib/**/*', 'MIT-LICENSE', 'Rakefile', 'README.md']
 
