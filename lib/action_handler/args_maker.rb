@@ -2,8 +2,7 @@
 
 module ActionHandler
   class ArgsMaker
-    # TODO: Support optional arguments and keyword arguments.
-
+    # TODO: Support keyword arguments.
     def make_args(parameters, supplier, context: nil)
       supplier_args = [context].compact
       parameters.inject([]) do |values, (_, name)|

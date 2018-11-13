@@ -3,6 +3,11 @@
 require 'action_handler/args_maker'
 require 'action_handler/response_evaluator'
 
+# TODO: Add `controller_send` (to use controller methods like `send_data`)
+
+# It is better if there is a way to return streaming response.
+# (`self.response_body = ` or `response.stream.write`?)
+
 module ActionHandler
   class Installer
     attr_reader :args_maker
