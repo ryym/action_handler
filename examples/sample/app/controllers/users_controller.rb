@@ -3,9 +3,7 @@
 class UsersHandler
   include ActionHandler::Equip
 
-  arg(:user_params) do |ctrl|
-    ctrl.params.require(:user).permit(:name)
-  end
+  args_params user: %i[name]
 
   def index
     users = User.all
@@ -21,8 +19,8 @@ class UsersHandler
     render locals: { user: User.new }
   end
 
-  def create(user_params)
-    user = User.create!(user_params)
+  def create(user)
+    user = User.create!(user)
     redirect_to urls.user_path(user.id)
   end
 end
