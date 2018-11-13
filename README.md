@@ -8,9 +8,9 @@ ActionHandler is a Rails plugin that helps you write controller functionalities 
 
 A handler is a controller-like class. Each public method can be an action method.
 But unlike controllers, handlers inherit few methods by default.
-Intead of using super class methods such as `params`, `sessions`, you can take them as arguments.
+Instead of using super class methods such as `params`, `sessions`, you can take them as arguments.
 And you need to represent a response (data for views) as a single return value,
-instead of assiging multiple instance variables.
+instead of assigning multiple instance variables.
 
 ```ruby
 # Example
@@ -56,8 +56,7 @@ end
 
 ### Clean and clear structure
 
-- In handlers, action methods take necessary inputs as arguments and
-  return output as a return value.
+- In handlers, action methods take necessary inputs as arguments and represent output as a return value.
   So easy to read and test.
 - Handler is just a class, so you can set up any dependencies via `initialize` method.
 
@@ -67,7 +66,7 @@ end
   just by declaring them as action method's arguments.
 - You can define custom injectable arguments as well.
 
-Note that this feature is heavily inspired by [ActionArgs](https://github.com/asakusarb/action_args).
+This feature is heavily inspired by [ActionArgs](https://github.com/asakusarb/action_args).
 
 ## Motivation
 
