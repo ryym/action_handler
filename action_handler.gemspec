@@ -9,12 +9,12 @@ Gem::Specification.new do |s|
   s.email = ['ryym.64@gmail.com']
   s.homepage = 'https://github.com/ryym/action_handler'
   s.summary = 'Rails controller alternative'
-  s.description = 'This makes your controllers more unit-testable.'
+  s.description = 'Makes your controllers more unit-testable.'
   s.license = 'MIT'
 
-  s.files = Dir['{app,config,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.md']
+  s.files = Dir['lib/**/*', 'MIT-LICENSE', 'Rakefile', 'README.md']
 
   s.add_development_dependency 'rspec', '~> 3'
-  s.add_development_dependency 'rspec_junit_formatter'
-  s.add_development_dependency 'rubocop', '>= 0.49'
+  s.add_development_dependency 'rspec_junit_formatter', '~> 0'
+  s.add_development_dependency 'rubocop', '~> 0.60'
 end
