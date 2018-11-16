@@ -1,24 +1,9 @@
-# README
+# ActionHandler sample app
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+This is a sample Rais application using ActionHandler.
 
-Things you may want to cover:
+This app has four controllers and all of them use ActionHandler.
+Each handler is defined in controller files directly in `app/controllers`.
 
-* Ruby version
+And handler tests are put in `test/handlers`.
 
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
