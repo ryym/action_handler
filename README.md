@@ -120,12 +120,8 @@ to use basic controller functionalities like `redirect_to` or custom arguments.
 
 ## Guides
 
-See [Wiki][wiki] for detailed guides.
+- [Detail guides][wiki]
+- [Example Rails app][example]
 
 [wiki]: https://github.com/ryym/action_handler/wiki
-
-TODO:
-
-- Currently Unsupported controller features
-- Where should handlers be placed?
-- Handler and its test example
+[example]: https://github.com/ryym/action_handler/tree/master/examples/sample
