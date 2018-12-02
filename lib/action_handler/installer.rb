@@ -21,17 +21,38 @@ module ActionHandler
       @res_evaluator = res_evaluator
     end
 
-    def install(handler, ctrl_class)
+    def install(ctrl_class, &block)
+      ctrl_class.instance_variable_set(:@_action_handler_factory, block)
+
+      installer = self
+      initializer = Module.new.tap do |m|
+        m.define_method(:initialize) do |*args|
+          super(*args)
+          factory = self.class.instance_variable_get(:@_action_handler_factory)
+          handler = factory.call(self)
+          installer.send(:setup, self, handler)
+        end
+      end
+
+      ctrl_class.prepend initializer
+    end
+
+    private def setup(ctrl, handler)
       config = ActionHandler::Config.get(handler.class) || ActionHandler::Config.new
 
-      ctrl_class.class_eval(&config.as_controller) if config.as_controller
+      # TODO: Remove `as_controller` feature.
+      # ctrl.class.class_eval(&config.as_controller) if config.as_controller
 
       actions = action_methods(handler, config)
       args_supplier = args_supplier(config)
 
       actions.each do |name|
         installer = self
-        ctrl_class.send(:define_method, name) do
+
+        # If we use `define_singleton_method`, methods don't work correctly.
+        # I don't know Rails internal details but
+        # Rails requires methods to be defined in a class.
+        ctrl.class.define_method(name) do
           method = handler.method(name)
           args = installer.args_maker.make_args(
             method.parameters,

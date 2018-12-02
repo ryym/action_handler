@@ -27,7 +27,7 @@ describe ActionHandler::Installer do
 
     ctrl_class = Class.new
     installer = ActionHandler::Installer.new(res_evaluator: noop_res_evaluator)
-    installer.install(handler_class.new, ctrl_class)
+    installer.install(ctrl_class) { handler_class.new }
     ctrl = ctrl_class.new
 
     expect(ctrl.index).to eq(status: :ok)
@@ -54,7 +54,7 @@ describe ActionHandler::Installer do
     end
 
     installer = ActionHandler::Installer.new(res_evaluator: noop_res_evaluator)
-    installer.install(handler_class.new, ctrl_class)
+    installer.install(ctrl_class) { handler_class.new }
     ctrl = ctrl_class.new
 
     expect(ctrl.show).to eq(
@@ -79,7 +79,7 @@ describe ActionHandler::Installer do
 
       ctrl_class = Class.new
       installer = ActionHandler::Installer.new
-      installer.install(handler_class.new, ctrl_class)
+      installer.install(ctrl_class) { handler_class.new }
       ctrl = ctrl_class.new
 
       expect(
@@ -119,7 +119,7 @@ describe ActionHandler::Installer do
       end
 
       installer = ActionHandler::Installer.new(res_evaluator: noop_res_evaluator)
-      installer.install(handler_class.new, ctrl_class)
+      installer.install(ctrl_class) { handler_class.new }
       ctrl = ctrl_class.new
 
       expect(ctrl.show).to eq(
@@ -162,7 +162,7 @@ describe ActionHandler::Installer do
       end
 
       installer = ActionHandler::Installer.new(res_evaluator: noop_res_evaluator)
-      installer.install(handler_class.new, ctrl_class)
+      installer.install(ctrl_class) { handler_class.new }
       ctrl = ctrl_class.new
 
       expect(ctrl.show).to eq(id: 333, name: 'Gon', cookie: :cookie)
@@ -196,7 +196,7 @@ describe ActionHandler::Installer do
       end
 
       installer = ActionHandler::Installer.new(res_evaluator: noop_res_evaluator)
-      installer.install(handler_class.new, ctrl_class)
+      installer.install(ctrl_class) { handler_class.new }
       ctrl = ctrl_class.new
 
       expect(ctrl.show).to eq(name: 'override Foo')
@@ -223,7 +223,7 @@ describe ActionHandler::Installer do
       end
 
       installer = ActionHandler::Installer.new(res_evaluator: noop_res_evaluator)
-      installer.install(handler_class.new, ctrl_class)
+      installer.install(ctrl_class) { handler_class.new }
       ctrl = ctrl_class.new
 
       expect(ctrl.show).to eq(
@@ -235,7 +235,8 @@ describe ActionHandler::Installer do
   end
 
   context 'when as_controller is specified' do
-    it 'runs given block inside of controller' do
+    # TODO: Remove
+    xit 'runs given block inside of controller' do
       handler_class = Class.new do
         include ActionHandler::Equip
 
@@ -254,7 +255,7 @@ describe ActionHandler::Installer do
 
       ctrl_class = Class.new
       installer = ActionHandler::Installer.new(res_evaluator: noop_res_evaluator)
-      installer.install(handler_class.new, ctrl_class)
+      installer.install(ctrl_class) { handler_class.new }
       ctrl = ctrl_class.new
 
       expect(ctrl.show).to eq(got: :some_value)

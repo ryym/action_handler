@@ -10,9 +10,8 @@ module ActionHandler
   end
 
   module ControllerExtension
-    def use_handler
-      handler = yield
-      ActionHandler::Installer.new.install(handler, self)
+    def use_handler(&block)
+      ActionHandler::Installer.new.install(self, &block)
     end
   end
 end
