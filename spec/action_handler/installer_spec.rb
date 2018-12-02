@@ -34,6 +34,32 @@ describe ActionHandler::Installer do
     expect(ctrl.show).to eq(json: :hello)
   end
 
+  it 'hooks controller initialization' do
+    tracks = []
+
+    handler_class = Class.new do
+      define_method(:initialize) do
+        tracks << :handler_init
+      end
+
+      def index
+        { status: :ok }
+      end
+    end
+
+    ctrl_class = Class.new do
+      define_method(:initialize) do
+        tracks << :controller_init
+      end
+    end
+
+    installer = ActionHandler::Installer.new(res_evaluator: noop_res_evaluator)
+    installer.install(ctrl_class) { handler_class.new }
+    ctrl_class.new
+
+    expect(tracks).to eq(%i[controller_init handler_init])
+  end
+
   it 'auto injects some arguments' do
     handler_class = Class.new do
       include ActionHandler::Equip
