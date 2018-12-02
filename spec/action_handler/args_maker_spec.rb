@@ -35,6 +35,32 @@ describe ActionHandler::ArgsMaker do
       expect(user.use(*values)).to eq([1, true])
     end
 
+    it 'supports keyword arguments' do
+      supplier_class = Class.new do
+        def a
+          :a
+        end
+
+        def b
+          :b
+        end
+
+        def c
+          :c
+        end
+      end
+
+      user_class = Class.new do
+        def use(a, b:, c:); end
+      end
+
+      maker = ActionHandler::ArgsMaker.new
+      params = user_class.new.method(:use).parameters
+      values = maker.make_args(params, supplier_class.new)
+
+      expect(values).to eq([:a, { b: :b, c: :c }])
+    end
+
     context 'with context' do
       it 'pass context to supplier methods' do
         supplier_class = Class.new do
