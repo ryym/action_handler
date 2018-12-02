@@ -4,20 +4,21 @@ require 'spec_helper'
 
 describe ActionHandler::ArgsMaker do
   describe '#make_args' do
-    it 'makes argument values' do
-      supplier_class = Class.new do
-        def a
-          [:alice, 1]
-        end
-
-        def b
-          { bob: true }
-        end
-
-        def c
-          :unused
+    def make_supplier(values)
+      supplier_class = Class.new.tap do |cls|
+        values.each do |name, value|
+          cls.define_method(name) { value }
         end
       end
+      supplier_class.new
+    end
+
+    it 'makes argument values' do
+      supplier = make_supplier(
+        a: [:alice, 1],
+        b: { bob: true },
+        c: :unused,
+      )
 
       user_class = Class.new do
         def use(b, a)
@@ -29,36 +30,28 @@ describe ActionHandler::ArgsMaker do
       params = user.method(:use).parameters
 
       maker = ActionHandler::ArgsMaker.new
-      values = maker.make_args(params, supplier_class.new)
+      values = maker.make_args(params, supplier)
 
       expect(values).to eq([{ bob: true }, [:alice, 1]])
       expect(user.use(*values)).to eq([1, true])
     end
 
     it 'supports keyword arguments' do
-      supplier_class = Class.new do
-        def a
-          :a
-        end
-
-        def b
-          :b
-        end
-
-        def c
-          :c
-        end
-      end
+      supplier = make_supplier(a: :A, b: :B, c: :C, d: :D)
 
       user_class = Class.new do
-        def use(a, b:, c:); end
+        def use(a, c, d:, b:)
+          [b, d, c, a].map(&:to_s).join
+        end
       end
 
       maker = ActionHandler::ArgsMaker.new
-      params = user_class.new.method(:use).parameters
-      values = maker.make_args(params, supplier_class.new)
+      user = user_class.new
+      params = user.method(:use).parameters
+      values = maker.make_args(params, supplier)
 
-      expect(values).to eq([:a, { b: :b, c: :c }])
+      expect(values).to eq([:A, :C, { d: :D, b: :B }])
+      expect(user.use(*values)).to eq('BDCA')
     end
 
     context 'with context' do
