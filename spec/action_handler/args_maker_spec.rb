@@ -27,10 +27,9 @@ describe ActionHandler::ArgsMaker do
       end
 
       user = user_class.new
-      params = user.method(:use).parameters
 
       maker = ActionHandler::ArgsMaker.new
-      values = maker.make_args(params, supplier)
+      values = maker.make_args(user.method(:use), supplier)
 
       expect(values).to eq([{ bob: true }, [:alice, 1]])
       expect(user.use(*values)).to eq([1, true])
@@ -47,8 +46,7 @@ describe ActionHandler::ArgsMaker do
 
       maker = ActionHandler::ArgsMaker.new
       user = user_class.new
-      params = user.method(:use).parameters
-      values = maker.make_args(params, supplier)
+      values = maker.make_args(user.method(:use), supplier)
 
       expect(values).to eq([:A, :C, { d: :D, b: :B }])
       expect(user.use(*values)).to eq('BDCA')
@@ -64,8 +62,7 @@ describe ActionHandler::ArgsMaker do
 
       maker = ActionHandler::ArgsMaker.new
       user = user_class.new
-      params = user.method(:use).parameters
-      expect { maker.make_args(params, supplier) }.to raise_error(
+      expect { maker.make_args(user.method(:use), supplier) }.to raise_error(
         ActionHandler::ActionArgumentError,
       )
     end
@@ -89,10 +86,8 @@ describe ActionHandler::ArgsMaker do
         end
 
         user = user_class.new
-        params = user.method(:use).parameters
-
         maker = ActionHandler::ArgsMaker.new
-        values = maker.make_args(params, supplier_class.new, context: 'world')
+        values = maker.make_args(user.method(:use), supplier_class.new, context: 'world')
 
         expect(values).to eq(['hello world', 'goodbye world'])
         expect(user.use(*values)).to eq('hello world!! goodbye world!!')

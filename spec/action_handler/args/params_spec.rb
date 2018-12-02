@@ -16,7 +16,7 @@ describe ActionHandler::Args::Params do
 
     supplier = ActionHandler::Args::Params.new(:id, :name)
     maker = ActionHandler::ArgsMaker.new
-    args = maker.make_args(consumer.method(:use).parameters, supplier, context: ctrl)
+    args = maker.make_args(consumer.method(:use), supplier, context: ctrl)
 
     expect(args).to eq([5, 'foo'])
   end
@@ -34,7 +34,7 @@ describe ActionHandler::Args::Params do
 
     supplier = ActionHandler::Args::Params.new(:id, user: %i[name age])
     maker = ActionHandler::ArgsMaker.new
-    args = maker.make_args(consumer.method(:use).parameters, supplier, context: ctrl)
+    args = maker.make_args(consumer.method(:use), supplier, context: ctrl)
 
     expect(args).to eq([1, { name: 'foo', age: 20 }])
   end

@@ -51,11 +51,7 @@ module ActionHandler
         # Rails requires methods to be defined in a class.
         ctrl.class.define_method(name) do
           method = handler.method(name)
-          args = installer.args_maker.make_args(
-            method.parameters,
-            args_supplier,
-            context: self,
-          )
+          args = installer.args_maker.make_args(method, args_supplier, context: self)
           res = method.call(*args)
           installer.res_evaluator.evaluate(self, res)
         end

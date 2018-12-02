@@ -10,7 +10,7 @@ class SessionsHandler
     redirect_to urls.mypage_path if current_user
   end
 
-  def login(params, session, reset_session)
+  def login(params:, session:, reset_session:)
     user = User.find_by(name: params[:name])
     return redirect_to urls.login_path, alert: "#{params[:name]} does not exist" if user.nil?
 
