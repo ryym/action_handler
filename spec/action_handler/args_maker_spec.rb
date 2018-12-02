@@ -54,6 +54,22 @@ describe ActionHandler::ArgsMaker do
       expect(user.use(*values)).to eq('BDCA')
     end
 
+    it 'rejects optional arguments' do
+      supplier = make_supplier(a: 1)
+      user_class = Class.new do
+        def use(a = 2)
+          a
+        end
+      end
+
+      maker = ActionHandler::ArgsMaker.new
+      user = user_class.new
+      params = user.method(:use).parameters
+      expect { maker.make_args(params, supplier) }.to raise_error(
+        ActionHandler::ActionArgumentError,
+      )
+    end
+
     context 'with context' do
       it 'pass context to supplier methods' do
         supplier_class = Class.new do
