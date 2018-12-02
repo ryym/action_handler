@@ -3,12 +3,6 @@
 class MypageHandler
   include ActionHandler::Equip
 
-  as_controller do
-    before_action do
-      redirect_to login_path if current_user.nil?
-    end
-  end
-
   args SessionArgs.instance
 
   arg(:theme) do |ctrl|
@@ -29,4 +23,8 @@ end
 
 class MypageController < ApplicationController
   use_handler { MypageHandler.new }
+
+  before_action do
+    redirect_to login_path if current_user.nil?
+  end
 end

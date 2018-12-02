@@ -14,22 +14,14 @@ module ActionHandler
       handler_class.instance_variable_set(CONFIG_VAR_NAME, config)
     end
 
-    attr_reader :as_controller
     attr_reader :action_methods
     attr_reader :args_suppliers
     attr_reader :custom_args
 
     def initialize
-      @as_controller = nil
       @action_methods = nil
       @args_suppliers = []
       @custom_args = {} # { method_name: proc }
-    end
-
-    def as_controller=(block)
-      raise ArgumentError, 'must be proc' unless block.is_a?(Proc)
-
-      @as_controller = block
     end
 
     def action_methods=(names)

@@ -40,9 +40,6 @@ module ActionHandler
     private def setup(ctrl, handler)
       config = ActionHandler::Config.get(handler.class) || ActionHandler::Config.new
 
-      # TODO: Remove `as_controller` feature.
-      # ctrl.class.class_eval(&config.as_controller) if config.as_controller
-
       actions = action_methods(handler, config)
       args_supplier = args_supplier(config)
 
