@@ -35,6 +35,10 @@ module ActionHandler
   end
 
   module HandlerExtension
+    def as_controller(&block)
+      ActionHandler::Config.get(self).as_controller = block
+    end
+
     def action_methods(*method_names)
       ActionHandler::Config.get(self).action_methods = method_names
     end

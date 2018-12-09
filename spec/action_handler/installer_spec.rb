@@ -57,7 +57,7 @@ describe ActionHandler::Installer do
     installer.install(ctrl_class) { handler_class.new }
     ctrl_class.new
 
-    expect(tracks).to eq(%i[controller_init handler_init])
+    expect(tracks).to eq(%i[handler_init controller_init])
   end
 
   it 'auto injects some arguments' do
@@ -257,6 +257,33 @@ describe ActionHandler::Installer do
         lang: { name: 'Ruby', author: 'Matz' },
         count: 4,
       )
+    end
+  end
+
+  context 'when as_controller is specified' do
+    it 'runs given block inside of controller' do
+      handler_class = Class.new do
+        include ActionHandler::Equip
+
+        as_controller do
+          @something = :some_value
+        end
+
+        arg(:something) do |ctrl|
+          ctrl.class.instance_variable_get(:@something)
+        end
+
+        def show(something)
+          { got: something }
+        end
+      end
+
+      ctrl_class = Class.new
+      installer = ActionHandler::Installer.new(res_evaluator: noop_res_evaluator)
+      installer.install(ctrl_class) { handler_class.new }
+      ctrl = ctrl_class.new
+
+      expect(ctrl.show).to eq(got: :some_value)
     end
   end
 end

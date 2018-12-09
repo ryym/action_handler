@@ -27,10 +27,13 @@ module ActionHandler
       installer = self
       initializer = Module.new.tap do |m|
         m.define_method(:initialize) do |*args|
-          super(*args)
           factory = self.class.instance_variable_get(:@_action_handler_factory)
-          handler = factory.call(self)
+          handler = factory.call
+          config = ActionHandler::Config.get(handler.class)
+          self.class.class_eval(&config.as_controller) if config&.as_controller
           installer.send(:setup, self, handler)
+
+          super(*args)
         end
       end
 
