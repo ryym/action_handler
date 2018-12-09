@@ -26,7 +26,7 @@ module ActionHandler
 
       installer = self
       initializer = Module.new.tap do |m|
-        m.define_method(:initialize) do |*args|
+        m.send(:define_method, :initialize) do |*args|
           factory = self.class.instance_variable_get(:@_action_handler_factory)
           handler = factory.call
           config = ActionHandler::Config.get(handler.class)
@@ -52,7 +52,7 @@ module ActionHandler
         # If we use `define_singleton_method`, methods don't work correctly.
         # I don't know Rails internal details but
         # Rails requires methods to be defined in a class.
-        ctrl.class.define_method(name) do
+        ctrl.class.send(:define_method, name) do
           method = handler.method(name)
           args = installer.args_maker.make_args(method, args_supplier, context: self)
           res = method.call(*args)
