@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.2.0 (2018-12-09)
+
+- Minor fix
+- Restore `as_controller` feature
+
 ## 0.1.0 (2018-12-02)
 
 - Improve handler initialization timing and lifetime
