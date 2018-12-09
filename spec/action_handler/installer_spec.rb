@@ -34,6 +34,32 @@ describe ActionHandler::Installer do
     expect(ctrl.show).to eq(json: :hello)
   end
 
+  # Currently this feature is not implemented yet.
+  xit 'does not override action method if alreday defined' do
+    handler_class = Class.new do
+      def index
+        { is: :handler }
+      end
+
+      def show
+        { is: :handler }
+      end
+    end
+
+    ctrl_class = Class.new do
+      def index
+        { is: :controller }
+      end
+    end
+
+    installer = ActionHandler::Installer.new(res_evaluator: noop_res_evaluator)
+    installer.install(ctrl_class) { handler_class.new }
+    ctrl = ctrl_class.new
+
+    expect(ctrl.index).to eq(is: :controller)
+    expect(ctrl.show).to eq(is: :handler)
+  end
+
   it 'hooks controller initialization' do
     tracks = []
 
